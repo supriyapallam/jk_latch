@@ -1,0 +1,59 @@
+//Design Code
+module jk_latch(output reg q,output wire qbar,input j,k,clk);
+  always@(clk)
+    begin
+      if(clk==1'b1)
+        begin
+          case({j,k})
+            2'b00: q=q;
+            2'b01: q=1'b0;
+            2'b10: q=1'b1;
+            2'b11: q=~q;
+            default: q=1'bx;
+          endcase
+        end
+      else
+        begin
+          q=q;
+        end
+    end
+  assign qbar=~q;
+endmodule
+
+//Test Bench Code
+module tb();
+  wire a,qbar;
+  reg j,k,clk;
+  jk_latch DUT(q,qbar,j,k,clk);
+  integer i;
+  initial
+    begin
+      clk=1'b0;
+      forever #10 clk=~clk;
+    end
+  
+  
+  initial
+    begin
+      for(i=0;i<8;i=i+1)
+        begin
+          {j,k}=i;
+          #10;
+        end
+      #10 $finish;
+    end
+  
+  initial
+    begin
+      $timeformat(-9,0,"ns",10);
+      $monitor("time=%0t,clk=%0b,j=%0b,k=%0b,q=%0b,qbar=%0b",$time,clk,j,k,q,qbar);
+    end
+  
+  initial
+    begin
+      $dumpfile("test.vcd");
+      $dumpvars(1);
+    end
+  
+endmodule
+
